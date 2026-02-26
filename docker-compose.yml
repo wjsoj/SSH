@@ -1,0 +1,53 @@
+version: "3.8"
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: wjsoj-ssh-web
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=${DATABASE_URL:-file:./prisma/dev.db}
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+      - NEXTAUTH_URL=${NEXTAUTH_URL:-http://localhost:3000}
+      - GITHUB_ID=${GITHUB_ID}
+      - GITHUB_SECRET=${GITHUB_SECRET}
+      - GITHUB_TOKEN=${GITHUB_TOKEN:-}
+    env_file:
+      - .env
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    volumes:
+      - ./prisma:/app/prisma
+
+  # Optional: PostgreSQL for production
+  # Uncomment to use PostgreSQL instead of SQLite
+  #
+  # postgres:
+  #   image: postgres:16-alpine
+  #   container_name: wjsoj-ssh-postgres
+  #   environment:
+  #     - POSTGRES_USER=${DB_USER:-wjsoj}
+  #     - POSTGRES_PASSWORD=${DB_PASSWORD}
+  #     - POSTGRES_DB=${DB_NAME:-wjsoj}
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   restart: unless-stopped
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-wjsoj}"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+
+# volumes:
+#   postgres_data:

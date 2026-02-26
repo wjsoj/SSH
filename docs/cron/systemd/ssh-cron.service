@@ -1,0 +1,23 @@
+# SSH Cron Service Configuration
+# For self-hosted deployment using systemd
+
+# Install instructions:
+# 1. Copy this file to /etc/systemd/system/ssh-cron.service
+# 2. Copy ssh-cron.timer to /etc/systemd/system/ssh-cron.timer
+# 3. Run: sudo systemctl daemon-reload
+# 4. Run: sudo systemctl enable ssh-cron.timer
+# 5. Run: sudo systemctl start ssh-cron.timer
+
+[Unit]
+Description=SSH Repository Sync Cron Job
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/curl -X POST https://your-domain.com/api/cron/sync \
+  -H "Authorization: Bearer %e" \
+  -H "Content-Type: application/json" \
+  -d '{"repositoryId": ""}'
+Environment=CRON_SECRET=your-cron-secret-here
+
+[Install]
+WantedBy=multi-user.target

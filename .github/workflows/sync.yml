@@ -1,0 +1,28 @@
+name: Sync Repositories
+
+on:
+  schedule:
+    # Run at 3:00 AM UTC every day
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+    inputs:
+      repositoryId:
+        description: "Specific repository ID to sync (optional)"
+        required: false
+        type: string
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Trigger Sync
+        run: |
+          curl -X POST "${{ secrets.CRON_URL }}/api/cron/sync" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json" \
+            -d '{"repositoryId":"${{ github.event.inputs.repositoryId }}"}'
+        env:
+          CRON_URL: ${{ secrets.CRON_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}

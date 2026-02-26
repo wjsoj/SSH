@@ -1,0 +1,17 @@
+# SSH Cron Configuration
+# Add to your crontab using: crontab -e
+
+# Sync all repositories daily at 2 AM
+0 2 * * * curl -X POST https://your-domain.com/api/cron/sync \
+  -H "Authorization: Bearer YOUR_CRON_SECRET" \
+  -H "Content-Type: application/json"
+
+# Sync specific repository every 6 hours
+# */6 * * * curl -X POST https://your-domain.com/api/cron/sync \
+#   -H "Authorization: Bearer YOUR_CRON_SECRET" \
+#   -H "Content-Type: application/json" \
+#   -d '{"repositoryId": "your-repo-id"}'
+
+# Sync weekly on Sunday at 3 AM
+# 0 3 * * 0 curl -X POST https://your-domain.com/api/cron/sync \
+#   -H "Authorization: Bearer YOUR_CRON_SECRET"

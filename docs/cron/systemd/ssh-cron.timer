@@ -1,0 +1,13 @@
+# SSH Cron Timer
+# Run sync daily at midnight
+
+[Unit]
+Description=SSH Repository Sync Timer
+Requires=ssh-cron.service
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+
+[Install]
+WantedBy=timers.target
