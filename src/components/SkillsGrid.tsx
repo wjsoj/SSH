@@ -1,5 +1,6 @@
 "use client";
 
+import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, CheckCircle, MessageSquare, Star } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -14,6 +15,16 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+
+const container = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.06 } },
+};
+
+const cardItem = {
+  hidden: { opacity: 0, y: 10 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.35, ease: "easeOut" } },
+};
 
 interface Skill {
   id: string;
@@ -49,6 +60,9 @@ export function SkillsGrid({
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
   const headingId = useId();
+  const shouldReduceMotion = useReducedMotion();
+  const resolvedContainer = shouldReduceMotion ? {} : container;
+  const resolvedItem = shouldReduceMotion ? {} : cardItem;
 
   const currentPage = Number(searchParams.get(paramName) || 1);
   const totalPages = Math.ceil(totalCount / pageSize);
@@ -123,59 +137,63 @@ export function SkillsGrid({
         </Badge>
       </div>
 
-      <div
+      <motion.div
         className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8 ${isPending ? "opacity-50" : ""}`}
+        variants={resolvedContainer}
+        initial="hidden"
+        animate="show"
       >
         {initialSkills.map((skill) => (
-          <Link
-            key={skill.id}
-            href={`/${skill.repository.owner}/${skill.repository.name}/${skill.slug}`}
-            className="group block"
-            aria-label={`View ${skill.name} skill`}
-          >
-            <Card className="h-full transition-colors hover:bg-muted/50 cursor-pointer border-muted">
-              <CardHeader className="pb-2">
-                <div className="flex items-start justify-between gap-2">
-                  <CardTitle className="text-sm font-medium group-hover:text-primary transition-colors line-clamp-1">
-                    {skill.name}
-                  </CardTitle>
-                  {skill.isVerified && (
-                    <Badge variant="secondary" className="text-xs shrink-0">
-                      <CheckCircle className="h-3 w-3 mr-1" />
-                      Verified
-                    </Badge>
-                  )}
-                </div>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
-                  {skill.description || "No description available"}
-                </p>
-                <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <div className="flex items-center gap-3">
-                    {skill.repository.stars > 0 && (
-                      <span className="flex items-center gap-1">
-                        <Star
-                          className="h-3.5 w-3.5 fill-primary text-primary"
-                          aria-hidden="true"
-                        />
-                        {skill.repository.stars}
-                      </span>
-                    )}
-                    {skill._count.comments > 0 && (
-                      <span className="flex items-center gap-1">
-                        <MessageSquare className="h-3.5 w-3.5" aria-hidden="true" />
-                        {skill._count.comments}
-                      </span>
+          <motion.div key={skill.id} variants={resolvedItem}>
+            <Link
+              href={`/${skill.repository.owner}/${skill.repository.name}/${skill.slug}`}
+              className="group block"
+              aria-label={`View ${skill.name} skill`}
+            >
+              <Card className="h-full card-glow transition-colors hover:bg-muted/50 cursor-pointer border-muted">
+                <CardHeader className="pb-2">
+                  <div className="flex items-start justify-between gap-2">
+                    <CardTitle className="text-sm font-medium group-hover:text-primary transition-colors line-clamp-1">
+                      {skill.name}
+                    </CardTitle>
+                    {skill.isVerified && (
+                      <Badge variant="secondary" className="text-xs shrink-0">
+                        <CheckCircle className="h-3 w-3 mr-1" />
+                        Verified
+                      </Badge>
                     )}
                   </div>
-                  <ArrowRight className="h-3.5 w-3.5 text-muted-foreground group-hover:text-primary transition-colors" />
-                </div>
-              </CardContent>
-            </Card>
-          </Link>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+                    {skill.description || "No description available"}
+                  </p>
+                  <div className="flex items-center justify-between text-xs text-muted-foreground">
+                    <div className="flex items-center gap-3">
+                      {skill.repository.stars > 0 && (
+                        <span className="flex items-center gap-1">
+                          <Star
+                            className="h-3.5 w-3.5 fill-primary text-primary"
+                            aria-hidden="true"
+                          />
+                          {skill.repository.stars}
+                        </span>
+                      )}
+                      {skill._count.comments > 0 && (
+                        <span className="flex items-center gap-1">
+                          <MessageSquare className="h-3.5 w-3.5" aria-hidden="true" />
+                          {skill._count.comments}
+                        </span>
+                      )}
+                    </div>
+                    <ArrowRight className="h-3.5 w-3.5 text-muted-foreground group-hover:text-primary transition-colors" />
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
 
       {totalPages > 1 && (
         <Pagination>

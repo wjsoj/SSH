@@ -31,6 +31,13 @@ async function getRepository(owner: string, repo: string) {
   if (repository) {
     const skillsWithCounts = repository.skills.map((skill) => ({
       ...skill,
+      repository: {
+        id: repository.id,
+        owner: repository.owner,
+        name: repository.name,
+        fullName: repository.fullName,
+        stars: repository.stars,
+      },
       _count: { comments: 0, reviews: 0 },
       reviews: [],
     })) as unknown as SkillWithCounts[];

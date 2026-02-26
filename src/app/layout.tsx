@@ -27,6 +27,14 @@ export default function RootLayout({
           className="fixed inset-0 z-[-1] bg-grid-pattern opacity-40 pointer-events-none"
           aria-hidden="true"
         />
+        <div
+          className="hero-glow-1 fixed z-[-1] top-[-80px] left-1/2 -translate-x-1/2 pointer-events-none"
+          aria-hidden="true"
+        />
+        <div
+          className="hero-glow-2 fixed z-[-1] top-[120px] right-[5%] pointer-events-none"
+          aria-hidden="true"
+        />
         <Providers>
           <div className="flex flex-col min-h-screen">
             <Header />

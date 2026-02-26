@@ -140,6 +140,73 @@
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
+
+  /* Ambient hero blobs */
+  .hero-glow-1 {
+    position: absolute;
+    width: 600px;
+    height: 400px;
+    background: radial-gradient(ellipse, oklch(0.62 0.2 255 / 0.12) 0%, transparent 70%);
+    filter: blur(60px);
+    pointer-events: none;
+  }
+  .hero-glow-2 {
+    position: absolute;
+    width: 400px;
+    height: 300px;
+    background: radial-gradient(ellipse, oklch(0.58 0.18 200 / 0.08) 0%, transparent 70%);
+    filter: blur(80px);
+    pointer-events: none;
+  }
+
+  :root:not(.dark) .hero-glow-1 {
+    opacity: 0.4;
+  }
+  :root:not(.dark) .hero-glow-2 {
+    opacity: 0.3;
+  }
+
+  /* Card hover glow — box-shadow only, no layout shift */
+  .card-glow {
+    transition:
+      box-shadow 0.25s ease,
+      background-color 0.2s ease;
+  }
+  .card-glow:hover {
+    box-shadow:
+      0 0 0 1px oklch(0.62 0.2 255 / 0.15),
+      0 4px 24px oklch(0.62 0.2 255 / 0.1);
+  }
+  :root:not(.dark) .card-glow:hover {
+    box-shadow:
+      0 0 0 1px oklch(0.55 0.2 255 / 0.12),
+      0 4px 16px oklch(0.55 0.2 255 / 0.07);
+  }
+
+  /* Terminal command block glow */
+  .terminal-glow {
+    transition: box-shadow 0.3s ease;
+  }
+  .terminal-glow:hover {
+    box-shadow:
+      0 0 0 1px oklch(0.62 0.2 255 / 0.2),
+      0 2px 16px oklch(0.62 0.2 255 / 0.08);
+  }
+
+  /* Pulsing dot */
+  .pulse-dot {
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

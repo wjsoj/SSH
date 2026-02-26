@@ -1,5 +1,6 @@
 "use client";
 
+import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -15,6 +16,16 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+
+const container = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.07 } },
+};
+
+const cardItem = {
+  hidden: { opacity: 0, y: 10 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.35, ease: "easeOut" } },
+};
 
 interface Repository {
   id: string;
@@ -42,6 +53,9 @@ export function CollectionsGrid({
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
+  const shouldReduceMotion = useReducedMotion();
+  const resolvedContainer = shouldReduceMotion ? {} : container;
+  const resolvedItem = shouldReduceMotion ? {} : cardItem;
 
   const currentPage = Number(searchParams.get(paramName) || 1);
   const totalPages = Math.ceil(totalCount / pageSize);
@@ -108,39 +122,43 @@ export function CollectionsGrid({
         </span>
       </div>
 
-      <div
+      <motion.div
         className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8 ${isPending ? "opacity-50" : ""}`}
+        variants={resolvedContainer}
+        initial="hidden"
+        animate="show"
       >
         {initialRepositories.map((repo) => (
-          <Link
-            key={repo.id}
-            href={`/${repo.owner}/${repo.name}`}
-            className="group block"
-            aria-label={`View ${repo.owner}/${repo.name} collection`}
-          >
-            <Card className="h-full transition-colors hover:bg-muted/50 cursor-pointer border-muted">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium group-hover:text-primary transition-colors line-clamp-1">
-                  {repo.owner}/{repo.name}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-0">
-                {repo.description && (
-                  <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
-                    {repo.description}
-                  </p>
-                )}
-                <div className="flex items-center justify-between">
-                  <Badge variant="secondary" className="text-xs">
-                    {repo._count.skills} skill{repo._count.skills !== 1 ? "s" : ""}
-                  </Badge>
-                  <ArrowRight className="h-3.5 w-3.5 text-muted-foreground group-hover:text-primary transition-colors" />
-                </div>
-              </CardContent>
-            </Card>
-          </Link>
+          <motion.div key={repo.id} variants={resolvedItem}>
+            <Link
+              href={`/${repo.owner}/${repo.name}`}
+              className="group block"
+              aria-label={`View ${repo.owner}/${repo.name} collection`}
+            >
+              <Card className="h-full card-glow transition-colors hover:bg-muted/50 cursor-pointer border-muted">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium group-hover:text-primary transition-colors line-clamp-1">
+                    {repo.owner}/{repo.name}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  {repo.description && (
+                    <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+                      {repo.description}
+                    </p>
+                  )}
+                  <div className="flex items-center justify-between">
+                    <Badge variant="secondary" className="text-xs">
+                      {repo._count.skills} skill{repo._count.skills !== 1 ? "s" : ""}
+                    </Badge>
+                    <ArrowRight className="h-3.5 w-3.5 text-muted-foreground group-hover:text-primary transition-colors" />
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
 
       {totalPages > 1 && (
         <Pagination>
