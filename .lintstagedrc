@@ -3,7 +3,7 @@
     "biome check --write",
     "biome format --write"
   ],
-  "*.{json,css,md,mdx,yml,yaml}": [
+  "*.{json,jsonc,css}": [
     "biome format --write"
   ]
 }

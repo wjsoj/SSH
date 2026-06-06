@@ -17,12 +17,28 @@ jobs:
     timeout-minutes: 30
 
     steps:
-      - name: Trigger Sync
+      - name: Check configuration
+        id: check
+        env:
+          CRON_URL: ${{ secrets.CRON_URL }}
         run: |
-          curl -X POST "${{ secrets.CRON_URL }}/api/cron/sync" \
-            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
-            -H "Content-Type: application/json" \
-            -d '{"repositoryId":"${{ github.event.inputs.repositoryId }}"}'
+          if [ -z "$CRON_URL" ]; then
+            echo "::warning::CRON_URL secret is not configured; skipping scheduled sync. \
+            Set the CRON_URL and CRON_SECRET repository secrets to enable it."
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Trigger Sync
+        if: steps.check.outputs.configured == 'true'
         env:
           CRON_URL: ${{ secrets.CRON_URL }}
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          REPOSITORY_ID: ${{ github.event.inputs.repositoryId }}
+        run: |
+          curl -fsS --retry 3 --retry-delay 5 --max-time 300 \
+            -X POST "${CRON_URL%/}/api/cron/sync" \
+            -H "Authorization: Bearer ${CRON_SECRET}" \
+            -H "Content-Type: application/json" \
+            -d "{\"repositoryId\":\"${REPOSITORY_ID}\"}"
